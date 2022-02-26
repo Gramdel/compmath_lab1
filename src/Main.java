@@ -47,6 +47,27 @@ public class Main {
             }
             System.out.println();
         }
+
+        double[] b = new double[n];
+        for (int i = 0; i < n; i++) {
+            while (true) {
+                System.out.println("Введите значение элемента b_" + (i+1) + " столбца свободных членов\n(действительное число с точкой в качестве разделителя):");
+                String tmp = reader.nextLine();
+                try {
+                    b[i] = Double.parseDouble(tmp);
+                    break;
+                } catch (NumberFormatException e) {
+                    if (!fixError("Требуется ввести действительное число с точкой (.) в качестве разделителя")) {
+                        System.out.println("Программа завершает работу.");
+                        System.exit(-1);
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < n; i++) {
+            System.out.println(b[i]);
+        }
     }
 
     private static boolean fixError(String msg) {
