@@ -22,12 +22,17 @@ public class IOUnit {
         System.exit(-1);
     }
 
-    public static double inputEps() {
+    public static double inputEps(boolean isInteractive) {
         double eps;
+        String tmp;
         while (true) {
-            System.out.println("Введите eps (точность; действительное число >0 c точкой (.) в качестве разделителя):");
-            String tmp = reader.nextLine();
             try {
+                if (isInteractive) {
+                    System.out.println("Введите eps (точность; действительное число >0 c точкой (.) в качестве разделителя):");
+                    tmp = reader.nextLine();
+                } else {
+                    tmp = reader.next();
+                }
                 eps = Double.parseDouble(tmp);
                 if (eps <= 0) {
                     throw new NumberFormatException();
@@ -35,6 +40,8 @@ public class IOUnit {
                 break;
             } catch (NumberFormatException e) {
                 handleError("Ошибка ввода eps! Требуется ввести действительное число, большее 0.", true);
+            } catch (NoSuchElementException e) {
+                handleError("Ошибка ввода eps! В файле кончились строки, исправьте файл.", false);
             }
         }
         return eps;
@@ -102,7 +109,8 @@ public class IOUnit {
         return n;
     }
 
-    public static void inputSystem(int n, double[][] a, double[] b, boolean isInteractive) {
+    public static void inputSystem(double[][] a, double[] b, boolean isInteractive) {
+        int n = a.length;
         String tmp;
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
@@ -142,8 +150,8 @@ public class IOUnit {
         }
     }
 
-    public static void printSystem(int n, double[][] a, double[] b) {
-        System.out.println("Введена следующая система:");
+    public static void printSystem(double[][] a, double[] b) {
+        int n = a.length;
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 if (j != 0) {

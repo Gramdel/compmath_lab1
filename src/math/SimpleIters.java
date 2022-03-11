@@ -3,12 +3,14 @@ package math;
 import static java.lang.Math.abs;
 
 public class SimpleIters {
-    public static ResultBean run(int n, double[][] a, double[] b, double eps, double[] x) {
+    public static ResultBean run(double[][] a, double[] b, double eps, double[] x) {
+        int n = a.length;
         double[] prevX = new double[n];
         double[] delta = new double[n];
         double maxDelta;
         int count = 0;
 
+        long startTime = System.nanoTime();
         do {
             count++;
             maxDelta = -1;
@@ -27,7 +29,8 @@ public class SimpleIters {
                 }
             }
         } while (maxDelta > eps);
+        long endTime = System.nanoTime();
 
-        return new ResultBean(x, delta, count);
+        return new ResultBean(x, delta, count, endTime-startTime);
     }
 }
