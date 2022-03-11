@@ -1,5 +1,7 @@
 package math;
 
+import java.util.Locale;
+
 import static utils.Convertor.toLowerIndex;
 
 public class ResultBean {
@@ -7,20 +9,22 @@ public class ResultBean {
     private final double[] delta;
     private final int count;
     private final long timeInNanos;
+    private final double eps;
 
-    public ResultBean(double[] x, double[] delta, int count, long timeInNanos) {
+    public ResultBean(double[] x, double[] delta, int count, long timeInNanos, double eps) {
         this.x = x;
         this.delta = delta;
         this.count = count;
         this.timeInNanos = timeInNanos;
+        this.eps = eps;
     }
 
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("Время работы метода: " + (double) timeInNanos /1000000);
+        StringBuilder s = new StringBuilder("Время работы метода: " + (double) timeInNanos / 1000000);
         s.append("мс\nКоличество итераций: ").append(count);
         for (int i = 0; i < x.length; i++) {
-            s.append("\nx").append(toLowerIndex(i + 1)).append(" = ").append(x[i]).append(" delta").append(toLowerIndex(i + 1)).append(" = ").append(delta[i]);
+            s.append("\nx").append(toLowerIndex(i + 1)).append("\t= ").append(String.format(Locale.ENGLISH, "%." + String.format(Locale.ENGLISH, "%f", eps).split("\\.")[1].length() + "f", x[i])).append("\t\tdelta").append(toLowerIndex(i + 1)).append("\t= ").append(delta[i]);
         }
         return s.toString();
     }

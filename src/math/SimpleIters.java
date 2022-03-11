@@ -29,6 +29,6 @@ public class SimpleIters {
         } while (maxDelta > eps);
         long endTime = System.nanoTime();
 
-        return new ResultBean(x, delta, count, endTime-startTime);
+        return new ResultBean(x, delta, count, endTime-startTime, eps);
     }
 }
