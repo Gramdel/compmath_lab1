@@ -1,37 +1,55 @@
+import java.io.*;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import static java.lang.Math.abs;
 
 public class Main {
-    private static final Scanner reader = new Scanner(System.in);
+    private static Scanner reader = new Scanner(System.in);
 
     public static void main(String[] args) {
         System.out.println("Вас приветствует программа для демонстрации метода простых итераций!");
-        byte mode = chooseMode();
+        int n;
+        double[][] a;
+        double[] b;
+        double eps = inputEps();
+        byte mode = inputMode();
 
-        boolean isInteractive = false;
-        int n = inputN(isInteractive);
-        double[][] a = new double[n][n];
-        double[] b = new double[n];
-        inputSystem(isInteractive, n, a, b);
-        printSystem(n, a, b);
+        if (mode == 2) {
+            n = inputN(true);
+            a = new double[n][n];
+            b = new double[n];
 
-        double eps = inputEps(isInteractive);
+            // generation
+        } else {
+            if (mode == 1) {
+                openFile(inputFilename());
+            }
+            boolean isInteractive = mode == 0;
+            n = inputN(isInteractive);
+            a = new double[n][n];
+            b = new double[n];
+            inputSystem(n, a, b, isInteractive);
+            printSystem(n, a, b);
+        }
+
         double[] x = new double[n];
         for (int i = 0; i < n; i++) {
             x[i] = b[i] / a[i][i];
         }
         System.out.println(simpleIters(n, a, b, eps, x));
+        exit();
     }
 
-    private static boolean handleError(String msg, boolean isInteractive) {
-        System.out.println("Некорректный ввод!\n" + msg);
+    private static void handleError(String msg, boolean isInteractive) {
+        System.out.println(msg);
         if (isInteractive) {
-            System.out.println("Enter = повторить ввод, любая другая клавиша + Enter = выход: ");
-            String check = reader.nextLine();
-            return check.isEmpty();
+            System.out.println("Enter = повторить ввод, любая другая клавиша + Enter = выход:");
+            if (reader.nextLine().isEmpty()) {
+                return;
+            }
         }
-        return false;
+        exit();
     }
 
     private static void exit() {
@@ -39,56 +57,10 @@ public class Main {
         System.exit(-1);
     }
 
-    private static byte chooseMode() {
-        byte mode;
-        while (true) {
-            System.out.println("Выберите режим работы программы (0 - ручной ввод, 1 - ввод из файла, 2 - автоматическая генерация):");
-            String tmp = reader.nextLine();
-            try {
-                mode = Byte.parseByte(tmp);
-                if (mode < 0 || mode > 2) {
-                    throw new NumberFormatException();
-                }
-                break;
-            } catch (NumberFormatException e) {
-                if (!handleError("Требуется ввести 0 для \"ручного ввода\", 1 - для \"ввода из файла\", 2 - для \"автоматической генерации\"", true)) {
-                    exit();
-                }
-            }
-        }
-        return mode;
-    }
-
-    private static int inputN(boolean isInteractive) {
-        int n;
-        while (true) {
-            if (isInteractive) {
-                System.out.println("Введите число неизвестных в системе (натуральное число <=20): ");
-            }
-
-            String tmp = reader.nextLine();
-            try {
-                n = Integer.parseInt(tmp);
-                if (n < 1 || n > 20) {
-                    throw new NumberFormatException();
-                }
-                break;
-            } catch (NumberFormatException e) {
-                if (!handleError("Требуется ввести натуральное число от 1 до 20 (включительно).", isInteractive)) {
-                    exit();
-                }
-            }
-        }
-        return n;
-    }
-
-    private static double inputEps(boolean isInteractive) {
+    private static double inputEps() {
         double eps;
         while (true) {
-            if (isInteractive) {
-                System.out.println("Введите точность (действительное число >0): ");
-            }
-
+            System.out.println("Введите eps (точность; действительное число >0 c точкой (.) в качестве разделителя):");
             String tmp = reader.nextLine();
             try {
                 eps = Double.parseDouble(tmp);
@@ -97,46 +69,109 @@ public class Main {
                 }
                 break;
             } catch (NumberFormatException e) {
-                if (!handleError("Требуется ввести действительное число, большее 0.", isInteractive)) {
-                    exit();
-                }
+                handleError("Ошибка ввода eps! Требуется ввести действительное число, большее 0.", true);
             }
         }
         return eps;
     }
 
-    private static void inputSystem(boolean isInteractive, int n, double[][] a, double[] b) {
+    private static byte inputMode() {
+        byte mode;
+        while (true) {
+            System.out.println("Выберите дальнейший режим работы программы (0 - ручной ввод, 1 - ввод из файла, 2 - автоматическая генерация):");
+            String tmp = reader.nextLine();
+            try {
+                mode = Byte.parseByte(tmp);
+                if (mode < 0 || mode > 2) {
+                    throw new NumberFormatException();
+                }
+                break;
+            } catch (NumberFormatException e) {
+                handleError("Ошибка ввода! Требуется ввести 0 для \"ручного ввода\", 1 - для \"ввода из файла\", 2 - для \"автоматической генерации\".", true);
+            }
+        }
+        return mode;
+    }
+
+    private static String inputFilename() {
+        while (true) {
+            System.out.println("Введите имя файла, из которого следует выполнить ввод:");
+            String tmp = reader.nextLine();
+            if (!tmp.matches("\\s*")) {
+                return tmp;
+            } else {
+                handleError("Ошибка ввода! Требуется ввести НЕ пустую строку.", true);
+            }
+        }
+    }
+
+    private static void openFile(String filename) {
+        try {
+            System.out.println("Пытаемся открыть файл \"" + filename + "\"...");
+            reader = new Scanner(new FileInputStream(filename));
+            System.out.println("Файл успешно открыт! Приступаем к вводу данных...");
+        } catch (FileNotFoundException e) {
+            handleError("Попытка открыть файл \"" + filename + "\" завершилась неудачей!", false);
+        }
+    }
+
+    private static int inputN(boolean isInteractive) {
+        int n;
+        while (true) {
+            if (isInteractive) {
+                System.out.println("Введите n (натуральное число <=20):");
+            }
+            try {
+                String tmp = reader.nextLine();
+                n = Integer.parseInt(tmp);
+                if (n < 1 || n > 20) {
+                    throw new NumberFormatException();
+                }
+                break;
+            } catch (NumberFormatException e) {
+                handleError("Ошибка ввода n! Требуется ввести натуральное число от 1 до 20 (включительно).", isInteractive);
+            } catch (NoSuchElementException e) {
+                handleError("Ошибка ввода n! В файле кончились строки, исправьте файл.", false);
+            }
+        }
+        return n;
+    }
+
+    private static void inputSystem(int n, double[][] a, double[] b, boolean isInteractive) {
+        String tmp;
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 while (true) {
-                    if (isInteractive) {
-                        System.out.println("Введите значение элемента a" + toLowerIndex(i + 1) + toLowerIndex(j + 1) + " матрицы коэффициентов\n(действительное число с точкой в качестве разделителя):");
-                    }
-
-                    String tmp = reader.nextLine();
                     try {
+                        if (isInteractive) {
+                            System.out.println("Введите a" + toLowerIndex(i + 1) + toLowerIndex(j + 1) + " (действительное число с точкой в качестве разделителя):");
+                            tmp = reader.nextLine();
+                        } else {
+                            tmp = reader.next();
+                        }
                         a[i][j] = Double.parseDouble(tmp);
                         break;
                     } catch (NumberFormatException e) {
-                        if (!handleError("Требуется ввести действительное число с точкой (.) в качестве разделителя", isInteractive)) {
-                            exit();
-                        }
+                        handleError("Ошибка ввода a" + toLowerIndex(i + 1) + toLowerIndex(j + 1) + "! Требуется ввести действительное число с точкой (.) в качестве разделителя.", isInteractive);
+                    } catch (NoSuchElementException e) {
+                        handleError("Ошибка ввода a" + toLowerIndex(i + 1) + toLowerIndex(j + 1) + "! В файле кончились строки, исправьте файл.", false);
                     }
                 }
             }
             while (true) {
-                if (isInteractive) {
-                    System.out.println("Введите значение элемента b" + toLowerIndex(i + 1) + " столбца свободных членов\n(действительное число с точкой в качестве разделителя):");
-                }
-
-                String tmp = reader.nextLine();
                 try {
+                    if (isInteractive) {
+                        System.out.println("Введите b" + toLowerIndex(i + 1) + " (действительное число с точкой в качестве разделителя):");
+                        tmp = reader.nextLine();
+                    } else {
+                        tmp = reader.next();
+                    }
                     b[i] = Double.parseDouble(tmp);
                     break;
                 } catch (NumberFormatException e) {
-                    if (!handleError("Требуется ввести действительное число с точкой (.) в качестве разделителя", isInteractive)) {
-                        exit();
-                    }
+                    handleError("Ошибка ввода b" + toLowerIndex(i + 1) + "! Требуется ввести действительное число с точкой (.) в качестве разделителя.", isInteractive);
+                } catch (NoSuchElementException e) {
+                    handleError("Ошибка ввода b" + toLowerIndex(i + 1) + "! В файле кончились строки, исправьте файл.", false);
                 }
             }
         }
