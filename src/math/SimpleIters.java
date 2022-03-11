@@ -1,7 +1,5 @@
 package math;
 
-import static java.lang.Math.abs;
-
 public class SimpleIters {
     public static ResultBean run(double[][] a, double[] b, double eps, double[] x) {
         int n = a.length;
@@ -23,7 +21,7 @@ public class SimpleIters {
                     }
                 }
 
-                delta[i] = abs(x[i] - prevX[i]);
+                delta[i] = Math.abs(x[i] - prevX[i]);
                 if (delta[i] > maxDelta) {
                     maxDelta = delta[i];
                 }

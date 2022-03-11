@@ -2,7 +2,6 @@ package math;
 
 import java.util.HashMap;
 
-import static java.lang.Math.abs;
 import static utils.IOUnit.printSystem;
 
 public class Dominance {
@@ -14,10 +13,10 @@ public class Dominance {
         for (int i = 0; i < n; i++) {
             double sumOfRow = 0;
             for (int j = 0; j < n; j++) {
-                sumOfRow += abs(a[i][j]);
+                sumOfRow += Math.abs(a[i][j]);
             }
             for (int j = 0; j < n; j++) {
-                if (abs(a[i][j]) > sumOfRow - abs(a[i][j])) {
+                if (Math.abs(a[i][j]) > sumOfRow - Math.abs(a[i][j])) {
                     if (indexMap.get(j) != null) {
                         return false;
                     }

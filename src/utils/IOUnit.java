@@ -22,31 +22,6 @@ public class IOUnit {
         System.exit(-1);
     }
 
-    public static double inputEps(boolean isInteractive) {
-        double eps;
-        String tmp;
-        while (true) {
-            try {
-                if (isInteractive) {
-                    System.out.println("Введите eps (точность; действительное число >0 c точкой (.) в качестве разделителя):");
-                    tmp = reader.nextLine();
-                } else {
-                    tmp = reader.next();
-                }
-                eps = Double.parseDouble(tmp);
-                if (eps <= 0) {
-                    throw new NumberFormatException();
-                }
-                break;
-            } catch (NumberFormatException e) {
-                handleError("Ошибка ввода eps! Требуется ввести действительное число, большее 0.", true);
-            } catch (NoSuchElementException e) {
-                handleError("Ошибка ввода eps! В файле кончились строки, исправьте файл.", false);
-            }
-        }
-        return eps;
-    }
-
     public static byte inputMode() {
         byte mode;
         while (true) {
@@ -148,6 +123,31 @@ public class IOUnit {
                 }
             }
         }
+    }
+
+    public static double inputEps(boolean isInteractive) {
+        double eps;
+        String tmp;
+        while (true) {
+            try {
+                if (isInteractive) {
+                    System.out.println("Введите eps (точность; действительное число больше 0 меньше 1 c точкой (.) в качестве разделителя):");
+                    tmp = reader.nextLine();
+                } else {
+                    tmp = reader.next();
+                }
+                eps = Double.parseDouble(tmp);
+                if (eps <= 0 || eps >= 1) {
+                    throw new NumberFormatException();
+                }
+                break;
+            } catch (NumberFormatException e) {
+                handleError("Ошибка ввода eps! Требуется ввести действительное число, большее 0 и меньшее 1.", true);
+            } catch (NoSuchElementException e) {
+                handleError("Ошибка ввода eps! В файле кончились строки, исправьте файл.", false);
+            }
+        }
+        return eps;
     }
 
     public static void printSystem(double[][] a, double[] b) {

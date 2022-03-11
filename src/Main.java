@@ -1,4 +1,5 @@
 import static math.Dominance.transform;
+import static math.Generator.generate;
 import static math.SimpleIters.run;
 import static utils.IOUnit.*;
 
@@ -15,8 +16,8 @@ public class Main {
             n = inputN(true);
             a = new double[n][n];
             b = new double[n];
+            generate(a, b);
 
-            // generation
             System.out.println("Сгенерирована следующая система с диагональным преобладанием:");
             printSystem(a, b);
             eps = inputEps(true);
@@ -32,10 +33,9 @@ public class Main {
 
             System.out.println("Введена следующая система:");
             printSystem(a, b);
-
             System.out.println("Пытаемся получить диагональное преобладание, если его нет...");
             if (!transform(a, b)) {
-                System.out.println("Метод не применим, так как в системе невозможно получить диаг. преобладание!");
+                System.out.println("Метод не применим, так как в системе невозможно получить диагональное преобладание!");
                 System.out.println("Программа завершает работу.");
                 System.exit(-2);
             }
