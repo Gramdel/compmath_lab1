@@ -9,4 +9,13 @@ public class Convertor {
         }
         return result.toString();
     }
+
+    public static int calcPrecision(double num) {
+        int precision = 0;
+        while (num < 1) {
+            precision++;
+            num *= 10;
+        }
+        return precision;
+    }
 }
